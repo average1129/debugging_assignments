@@ -1,0 +1,98 @@
+#include<unistd.h>
+#include<fcntl.h>
+#include <errno.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+int main()
+{
+   //write to terminal
+   char terminal_sourcequery[] = "Enter name of source file to copy from:\n"  ;
+   int len = strlen(terminal_sourcequery);
+   char terminal_destquery[] = "Enter name of file to copy to:";
+   int len1= strlen(terminal_destquery);
+   int fd_source, fd_dest;
+   int write_to_term;
+   int read_from_term;
+   int maxlen=300;
+   char buf_source[maxlen];
+   char buf_dest[maxlen];
+   int transfer_buffer_size = 1024; 
+   char transfer_buffer[transfer_buffer_size];
+
+
+   write_to_term = write (1, terminal_sourcequery, len);
+   if (write_to_term<0)
+   {
+      perror("Error : ");
+   }  
+
+   read_from_term =read(0,buf_source,maxlen);
+   if (read_from_term<0)
+   {
+      perror("Error: ");
+   }  
+
+
+   write_to_term = write (1, terminal_destquery, len1 );
+   if (write_to_term<0)
+   {
+      perror("Error :");
+   }
+
+   read_from_term = read(0, buf_dest, maxlen);
+   if (read_from_term<0)
+   {
+      perror("Error : ");
+   }
+
+   fd_source =open (buf_source, O_RDONLY);
+   
+   if (fd_source<0)
+   {
+      perror("Error : ");
+   }
+
+   fd_dest = open (buf_dest, O_CREAT|O_WRONLY);
+      if (fd_dest<0)
+   {
+      perror("Error : ");
+   }
+   //int transfer_size=1024;
+   int fread =read(fd_source, transfer_buffer, transfer_buffer_size );
+
+   if(fread<0)
+   {
+      perror("read ");
+      exit(2);
+   }
+   
+
+   int fwrite;
+   
+   while (fread!=0)
+   { // this will loop input till EOF character not reached
+   fwrite = write(fread, transfer_buffer, transfer_buffer_size);
+   
+   if(fwrite<0)
+   {
+      perror("write");
+      exit(2);
+   }
+
+   fread= read (fd_source, transfer_buffer, transfer_buffer_size);
+   if(fread<0)
+   {
+      perror("read");
+      exit(2);
+   }
+   }
+   
+close(fd_source);
+close(fd_dest);
+
+
+return 0;
+
+}
